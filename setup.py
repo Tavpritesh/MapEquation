@@ -8,14 +8,9 @@ NEWS = open(os.path.join(here, 'NEWS.txt')).read()
 
 version = '0.1'
 
-install_requires = [
-    numpy,
-    networkx,
-    # List your project dependencies here.
-    # For more details, see:
-    # http://packages.python.org/distribute/setuptools.html#declaring-dependencies
-]
 
+with open('requires.txt') as f:
+    install_requires = f.read().splitlines()
 
 setup(name='MapEquation',
     version=version,
