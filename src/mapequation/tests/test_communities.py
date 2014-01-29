@@ -36,6 +36,7 @@ import unittest
 
 class test_Communities(unittest.TestCase):
 
+
   def __init__(self, *args, **kwargs):
     super(test_Communities, self).__init__(*args, **kwargs)
     self.G = nx.DiGraph()
@@ -73,6 +74,16 @@ class test_Communities(unittest.TestCase):
     G = C.graph
     for n in G.nodes():
       self.assertEqual(G.node[n]['pageRank'] , pr[n])
+
+  def test_exit_probability(self):
+    result_p_exit = {}
+    result_p_exit[0] = (0, 0.05545240613126138, [0.05545240613126138])
+    result_p_exit[1] = (1, 0.232325259704312, [0.23232525970431203])
+    result_p_exit[2] = (2, 0.36471477553136467, [0.36471477553136467])
+    result_p_exit[3] = (3, 0.34750755863306193, [0.34750755863306193])
+    C = Communities(self.G)
+    for k,v in C.iteritems():
+      self.assertEqual(C.exit_probability(k,v), result_p_exit[k])
 
 
 
