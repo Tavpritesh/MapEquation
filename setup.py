@@ -41,8 +41,4 @@ setup(name='MapEquation',
     zip_safe=True,
     install_requires=install_requires,
     test_suite='nose.collector',
-    entry_points={
-        'console_scripts':
-            ['MapEquation=mapequation:main']
-    }
 )
