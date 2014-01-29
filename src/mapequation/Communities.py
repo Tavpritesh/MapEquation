@@ -226,7 +226,7 @@ class Communities:
     weight = self._weight_attribut
     nb_node_in_community = len(nodes_in_community)
     p_i = []
-    # Compute the exit probability
+    # Compute the exit probability of each node in the community
     for n in nodes_in_community:
       p_ergodic_stay += self._G.node[n]['pageRank']
       p_i.append(self._G.node[n]['pageRank'])
@@ -234,7 +234,7 @@ class Communities:
       for neighbor in self._G.neighbors(n):
         if neighbor not in nodes_in_community:
           p_exit += self._G.node[n]['pageRank'] * self._G[n][neighbor][weight]
-
+      # Compute the P_exit as funtion of the pageRank of each node in the community
       p_exit *= self._alpha
       p_exit += ((1-self._alpha) *
         ((self._nodes - nb_node_in_community)/(self._nodes - 1)) *
