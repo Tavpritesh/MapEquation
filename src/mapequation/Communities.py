@@ -50,7 +50,7 @@ class Communities:
     self._weight_attribut = weight
     for u,v,edata in self._G.edges(data=True):
       if self._weight_attribut not in edata:
-        raise AttributeError('The Graph has a missing weight attribut on his edges {} {}'.format(u,v))
+        raise AttributeError('The Graph has a missing weight attribut on edges')
 
 
     # Compute the pageRank for the Graph
