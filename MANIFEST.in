@@ -1,2 +1,11 @@
 include README.rst
 include NEWS.txt
+include MANIFEST.in
+include NEWS.txt
+include README.rst
+include setup.py
+include requires.txt
+include bootstrap.py
+include buildout.cfg
+include HACKING.txt
+recursive-include src *.py
