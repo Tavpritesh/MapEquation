@@ -2,7 +2,7 @@ include README.rst
 include NEWS.txt
 include MANIFEST.in
 include NEWS.txt
-include README.rst
+include README.md
 include setup.py
 include requires.txt
 include bootstrap.py
