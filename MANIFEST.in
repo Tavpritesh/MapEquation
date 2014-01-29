@@ -1,4 +1,3 @@
-include README.rst
 include NEWS.txt
 include MANIFEST.in
 include NEWS.txt
