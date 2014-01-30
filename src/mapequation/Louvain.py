@@ -1,5 +1,5 @@
 # -*- encoding: utf-8 -*-
-
+from __future__ import print_function
 # -------------------------------------------------------------------------------
 # Copyright (c) 2014 Vincent Gauthier Telecom SudParis.
 #
@@ -71,21 +71,21 @@ class Louvain(Communities):
     # DEBUG
     #
     if self._DEBUG:
-      print ''
-      print "### Begining of Phase 1 ###"
-      print "---------------------------"
-      print "Community_id \t node_id"
-      print "---------------------------"
+      print('')
+      print("### Begining of Phase 1 ###")
+      print("---------------------------")
+      print("Community_id \t node_id")
+      print("---------------------------")
       for k, v in self.iteritems():
-        print "{}\t\t{}".format(k,v)
-      print "### End of Phase 1 ###"
+        print("{}\t\t{}".format(k,v))
+      print("### End of Phase 1 ###")
 
     return self
 
 
   def louvain_phase_2(self):
     '''
-    To be cleaned
+    To clean up
     '''
     G = nx.DiGraph()
     weight = self._weight_attribut
@@ -95,71 +95,69 @@ class Louvain(Communities):
 
       # if the nodes belong to different communities
       if u_community_id != v_community_id:
-        # if edge between the two communities already exist
-        if G.has_edge(u_community_id,v_community_id):
-          G[u_community_id][v_community_id][weight] += self._G[u][v][weight]
-          if u not in G.node[u_community_id]['nodes_in_community']:
-            G.node[u_community_id]['nodes_in_community'].append(u)
-            G.node[u_community_id]['nodes_in_community'] = list(set(self._G.node[u]['nodes_in_community']) | set(G.node[u_community_id]['nodes_in_community']))
-          if v not in  G.node[v_community_id]['nodes_in_community']:
-            G.node[v_community_id]['nodes_in_community'].append(v)
-            s1 = set(self._G.node[v]['nodes_in_community'])
-            s2 = set(G.node[v_community_id]['nodes_in_community'])
-            G.node[v_community_id]['nodes_in_community'] = list(s1 | s2)
-        else:
-          # Test if node exit
-          if G.has_node(v_community_id):
-            if v not in G.node[v_community_id]['nodes_in_community']:
-              G.node[v_community_id]['nodes_in_community'].append(v)
-              s1 = set(self._G.node[v]['nodes_in_community'])
-              s2 = set(G.node[v_community_id]['nodes_in_community'])
-              G.node[v_community_id]['nodes_in_community'] = list( s1 | s2 )
-          else:
-            G.add_node(v_community_id)
-            G.node[v_community_id]['nodes_in_community'] = [v]
-            s1 = set(self._G.node[v]['nodes_in_community'])
-            s2 = set(G.node[v_community_id]['nodes_in_community'])
-            G.node[v_community_id]['nodes_in_community'] = list( s2 | s1)
-          # Test if node exit
-          if G.has_node(u_community_id):
-            if u not in G.node[u_community_id]['nodes_in_community']:
-              G.node[u_community_id]['nodes_in_community'].append(u)
-              s1 = set(self._G.node[u]['nodes_in_community'])
-              s2 = set(G.node[u_community_id]['nodes_in_community'])
-              G.node[u_community_id]['nodes_in_community'] = list( s1 | s2)
-          else:
-            G.add_node(u_community_id)
-            G.node[u_community_id]['nodes_in_community'] = [u]
-            s1 = set(self._G.node[u]['nodes_in_community'])
-            s2 = set( G.node[u_community_id]['nodes_in_community'])
-            G.node[u_community_id]['nodes_in_community'] = list( s1 | s2)
-
-          G.add_edge(u_community_id, v_community_id)
-          G[u_community_id][v_community_id][weight] = self._G[u][v][weight]
-
-      # if node belong to the same community
+        G = self.egdes_fusion(G, u_community_id, u, v_community_id, v)
+      # if node u,v belong to the same community
       else:
         G.add_node(u_community_id)
-        G.node[u_community_id]['nodes_in_community'] = [u,v]
-        s1 = set(self._G.node[u]['nodes_in_community'])
-        s2 = set(G.node[u_community_id]['nodes_in_community'])
-        s3 = set(self._G.node[v]['nodes_in_community'])
-        G.node[u_community_id]['nodes_in_community'] = list(s1 | s2 | s3)
-
+        G = self.add_node_in_community(G, u_community_id, u)
+        G = self.add_node_in_community(G, u_community_id, v)
     self._G = G
     self.init_communities()
     #
     # DEBUG
     #
     if self._DEBUG:
-      print "### Begining of Phase 2 ###"
-      print "---------------------------"
-      print "Community id, node id, nodes_in_community"
-      print "---------------------------"
+      print("### Begining of Phase 2 ###")
+      print("---------------------------")
+      print("Community id, node id, nodes_in_community")
+      print("---------------------------")
       for k, v in self.iteritems():
-        print k,v
-      for n in self._G.nodes():
-        print self._G.node[n]['nodes_in_community']
-      print "### End of Phase 2 ###"
+        print('{}\t{}\t'.format(k,v), end='')
+        for n in v:
+          print(self._G.node[n]['nodes_in_community'], end='')
+        print('')
+      print("### End of Phase 2 ###")
+      print('')
 
     return self
+
+  def egdes_fusion(self, G, u_community_id, u, v_community_id, v):
+    weight = self._weight_attribut
+    # if edge between the two communities already exist
+    if G.has_edge(u_community_id,v_community_id):
+      G[u_community_id][v_community_id][weight] += self._G[u][v][weight]
+      G = self.add_node_in_community(G, u_community_id, u)
+      G = self.add_node_in_community(G, v_community_id, v)
+    else:
+      G.add_edge(u_community_id, v_community_id)
+      self.add_node_in_community(G,v_community_id, v)
+      self.add_node_in_community(G,u_community_id, u)
+      G[u_community_id][v_community_id][weight] = self._G[u][v][weight]
+    return G
+
+
+  def get_node_in_community(self, community):
+    nodes = self._communities[community]
+    node_in = []
+    for n in nodes:
+      for nn in self._G.node[n]['nodes_in_community']:
+        node_in.append(nn)
+    return node_in
+
+  def add_node_in_community(self, G, community_id, u):
+    if 'nodes_in_community' not in G.node[community_id]:
+      G.node[community_id]['nodes_in_community'] = [u]
+    if u not in G.node[community_id]['nodes_in_community']:
+      G.node[community_id]['nodes_in_community'].append(u)
+    s1 = set(self._G.node[u]['nodes_in_community'])
+    s2 = set(G.node[community_id]['nodes_in_community'])
+    G.node[community_id]['nodes_in_community'] = list( s1 | s2)
+    return G
+
+  def run_louvain(self):
+    self.louvain_phase_1()
+    self.louvain_phase_2()
+    return self
+
+
+

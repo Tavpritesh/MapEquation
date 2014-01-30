@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 
 # -------------------------------------------------------------------------------
-# Copyright (c) 2013 Vincent Gauthier Telecom SudParis.
+# Copyright (c) 2014 Vincent Gauthier Telecom SudParis.
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -88,7 +88,6 @@ class Communities(object):
     self.gen_communities_dict()
     return self._communities.iteritems()
 
-
   def init_communities(self):
     '''
     Initialize the communities structure with one single node in each community
@@ -113,6 +112,18 @@ class Communities(object):
       else:
         communities[self._G.node[n]['community_id']] = [n]
     self._communities = communities
+
+
+  # def node_in_community(self, community):
+  #   res = []
+  #   self.init_communities()
+  #   self.gen_communities_dict()
+  #   print self._communities
+  #   for nodes in self._communities[community]:
+  #     for n in nodes:
+  #       res.append(self._G.node[n]['nodes_in_community'])
+
+  #   return res
 
 
   def normalize_edges_weight(self):

@@ -58,8 +58,18 @@ class test_Louvain(unittest.TestCase):
     for k,v in L.iteritems():
       self.assertEqual(self.phase1[k], v)
 
+  def test_Louvain_phase2(self):
+    L = Louvain(self.G).louvain_phase_1().louvain_phase_2()
+    for k,v in L.iteritems():
+      self.assertEqual(L.get_node_in_community(k), self.phase1[v.pop()])
+
+  def test_run_louvain(self):
+    L = Louvain(self.G, debug=True).run_louvain()
+    for k,v in L.iteritems():
+      self.assertEqual(L.get_node_in_community(k), self.phase1[v.pop()])
+
 def main():
   unittest.main()
 
 if __name__ == '__main__':
-    main()
+  main()
