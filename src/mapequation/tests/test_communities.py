@@ -72,6 +72,11 @@ class test_Communities(unittest.TestCase):
     for k, v in C.iteritems():
       self.assertEqual([k], v)
 
+  def test_iter(self):
+    "Test iterator"
+    C = Communities(self.G)
+    self.assertEqual([c for c in C],[0,1,2,3])
+
   def test_nodes_in_community(self):
     "Test if the node in community attribut in each nodes is empty"
     C = Communities(self.G)

@@ -34,7 +34,7 @@ class Communities:
   # Class Variables
   #
   _G = {}
-  _communites = {}
+  _communities = {}
   _nodes = 0
   _alpha = 0
 
@@ -62,17 +62,19 @@ class Communities:
     self.compute_pagerank(alpha=alpha)
 
   def __str__(self):
-    return "Networkx Graph with #{0} communities found".format(len(self._communites))
+    self.gen_communities_dict()
+    return "Networkx Graph with {} communities found".format(len(self._communities))
 
   def __unicode__(self):
-    return u"Networkx Graph with #{0} communities found".format(len(self._communites))
+    self.gen_communities_dict()
+    return u"Networkx Graph with {} communities found".format(len(self._communities))
 
   def __iter__(self):
     '''
     return an Iterator for communites dictionary
     '''
     self.gen_communities_dict()
-    return iter(self._communites)
+    return iter(self._communities)
 
   @property
   def graph(self):
@@ -103,13 +105,13 @@ class Communities:
     '''
     Extract the communities structure from the Graph attributes (self._G)
     '''
-    communites = dict()
+    communities = dict()
     for n in self._G.nodes():
-      if self._G.node[n]['community_id'] in communites:
-        communites[self._G.node[n]['community_id']].append(n)
+      if self._G.node[n]['community_id'] in communities:
+        communities[self._G.node[n]['community_id']].append(n)
       else:
-        communites[self._G.node[n]['community_id']] = [n]
-    self._communities = communites
+        communities[self._G.node[n]['community_id']] = [n]
+    self._communities = communities
 
 
   def normalize_edges_weight(self):

@@ -27,7 +27,11 @@ __author__ = """\n""".join(['Vincent Gauthier <vgauthier@luxbulb.org>'])
 
 import Communities
 
-class Louvain(Community):
+class Louvain(Communities):
+
+  def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+
   def louvain_phase_1(self):
     import numpy as np
     # Compute the initial MapEquation
