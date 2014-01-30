@@ -67,18 +67,20 @@ class test_Communities(unittest.TestCase):
     self.assertRaises(AttributeError, Communities, self.G, weight='xxxx')
 
   def test_communities_initial_states(self):
+    "Test the initial states"
     C = Communities(self.G)
     for k, v in C.iteritems():
       self.assertEqual([k], v)
 
   def test_nodes_in_community(self):
-    "test if the node in community field in each node is empty"
+    "Test if the node in community attribut in each nodes is empty"
     C = Communities(self.G)
     G = C.graph
     for n in G.nodes():
       self.assertEqual(G.node[n]['nodes_in_community'] , [])
 
   def test_pageRank(self):
+    "Test the pageRank computation"
     pr = nx.pagerank(self.G, alpha=0.85)
     C = Communities(self.G, alpha=0.85)
     G = C.graph
@@ -86,11 +88,13 @@ class test_Communities(unittest.TestCase):
       self.assertEqual(G.node[n]['pageRank'] , pr[n])
 
   def test_exit_probability(self):
+    "Test the exit probability"
     C = Communities(self.G)
     for k,v in C.iteritems():
       self.assertEqual(C.exit_probability(k,v), self.result_p_exit[k])
 
   def test_LM(self):
+    "Test the MapEquation equations"
     C = Communities(self.G)
     self.assertEqual(C.LM(), self.LM)
 
