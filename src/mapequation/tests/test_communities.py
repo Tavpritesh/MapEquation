@@ -47,13 +47,23 @@ class test_Communities(unittest.TestCase):
     self.G.add_edge(2,3, weight=10)
     self.G.add_edge(3,1, weight=10)
     self.G.add_edge(3,2, weight=10)
+    self.LM = -3.7812341924542952
+    self.result_p_exit = {}
+    self.result_p_exit[0] = (0, 0.05545240613126138, [0.05545240613126138])
+    self.result_p_exit[1] = (1, 0.232325259704312, [0.23232525970431203])
+    self.result_p_exit[2] = (2, 0.36471477553136467, [0.36471477553136467])
+    self.result_p_exit[3] = (3, 0.34750755863306193, [0.34750755863306193])
 
-  def testCommunities_init(self):
+  def test_Communities_init(self):
     "Test Communities Constructor"
     Communities(self.G)
 
+  def test_wrong_argument(self):
+    "Test if raises AttributeError when wrong argument is passed"
+    self.assertRaises(AttributeError, Communities, 'xxxxxxx')
+
   def test_Communities_ValueError(self):
-    "Test Raises AttributeError when the graph weight are not sets properly"
+    "Test if raises AttributeError when the graph weight are not sets properly"
     self.assertRaises(AttributeError, Communities, self.G, weight='xxxx')
 
   def test_communities_initial_states(self):
@@ -76,15 +86,13 @@ class test_Communities(unittest.TestCase):
       self.assertEqual(G.node[n]['pageRank'] , pr[n])
 
   def test_exit_probability(self):
-    result_p_exit = {}
-    result_p_exit[0] = (0, 0.05545240613126138, [0.05545240613126138])
-    result_p_exit[1] = (1, 0.232325259704312, [0.23232525970431203])
-    result_p_exit[2] = (2, 0.36471477553136467, [0.36471477553136467])
-    result_p_exit[3] = (3, 0.34750755863306193, [0.34750755863306193])
     C = Communities(self.G)
     for k,v in C.iteritems():
-      self.assertEqual(C.exit_probability(k,v), result_p_exit[k])
+      self.assertEqual(C.exit_probability(k,v), self.result_p_exit[k])
 
+  def test_LM(self):
+    C = Communities(self.G)
+    self.assertEqual(C.LM(), self.LM)
 
 
 def main():

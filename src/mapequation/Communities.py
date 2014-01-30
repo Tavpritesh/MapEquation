@@ -42,6 +42,8 @@ class Communities:
   # Constructor
   #
   def __init__(self, G, alpha=0.85, weight='weight'):
+    if not isinstance(G, nx.classes.graph.Graph):
+      raise AttributeError('The Graph is not an instance of networkx Graph')
     self._G = G.copy()
     self._nodes = len(self._G)
     self._alpha = alpha
