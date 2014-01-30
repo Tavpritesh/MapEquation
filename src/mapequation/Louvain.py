@@ -157,6 +157,10 @@ class Louvain(Communities):
   def run_louvain(self):
     self.louvain_phase_1()
     self.louvain_phase_2()
+    self.normalize_edges_weight()
+    for u,v, edata in self._G.edges(data=True):
+      print(u,v, edata)
+    #self.compute_pagerank(alpha=self._alpha)
     return self
 
 

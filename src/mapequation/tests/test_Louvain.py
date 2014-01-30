@@ -64,7 +64,15 @@ class test_Louvain(unittest.TestCase):
       self.assertEqual(L.get_node_in_community(k), self.phase1[v.pop()])
 
   def test_run_louvain(self):
+    for u,v, edata in self.G.edges(data=True):
+      print u,v, edata
     L = Louvain(self.G, debug=True).run_louvain()
+    for k,v in L.iteritems():
+      self.assertEqual(L.get_node_in_community(k), self.phase1[v.pop()])
+
+  def test_run_louvain2(self):
+    L = Louvain(self.G).run_louvain()
+    nx.pagerank(L._G)
     for k,v in L.iteritems():
       self.assertEqual(L.get_node_in_community(k), self.phase1[v.pop()])
 
