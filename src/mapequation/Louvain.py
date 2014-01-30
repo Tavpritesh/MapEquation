@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 
 # -------------------------------------------------------------------------------
-# Copyright (c) 2013 Vincent Gauthier Telecom SudParis.
+# Copyright (c) 2014 Vincent Gauthier Telecom SudParis.
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -25,16 +25,23 @@
 
 __author__ = """\n""".join(['Vincent Gauthier <vgauthier@luxbulb.org>'])
 
-import Communities
+try:
+  from ..Communities import Communities
+except ValueError:
+  import sys, os
+  sys.path.append(os.path.join('..'))
+  from mapequation.Communities import Communities
+
+import networkx as nx
+import numpy as np
 
 class Louvain(Communities):
 
   def __init__(self, *args, **kwargs):
-    super().__init__(*args, **kwargs)
+    super(Louvain, self).__init__(*args, **kwargs)
 
   def louvain_phase_1(self):
-    import numpy as np
-    # Compute the initial MapEquation
+    # Compute the initial MapEquation for all communities
     for n in self._G.nodes():
       config = dict()
       ME = self.LM()
@@ -45,6 +52,7 @@ class Louvain(Communities):
           self._G.node[n]['community_id'] = self._G.node[neighbor]['community_id']
           ME_new = self.LM()
           config[self._G.node[n]['community_id']] = np.abs(ME_new)
+      ## End For
 
       # Search the local minimum
       min_val = None
@@ -58,16 +66,21 @@ class Louvain(Communities):
       self._G.node[n]['community_id'] = min_community
     ## End For
 
+
     #
     # DEBUG
     #
-    print "### Begining of Phase 1 ###"
-    print "---------------------------"
-    print "Community id, node id"
-    print "---------------------------"
-    for k, v in self.iteritems():
-      print k,v
-    print "### End of Phase 1 ###"
+    if self._DEBUG:
+      print ''
+      print "### Begining of Phase 1 ###"
+      print "---------------------------"
+      print "Community_id \t node_id"
+      print "---------------------------"
+      for k, v in self.iteritems():
+        print "{}\t\t{}".format(k,v)
+      print "### End of Phase 1 ###"
+
+    return self
 
 
   def louvain_phase_2(self):
@@ -138,12 +151,15 @@ class Louvain(Communities):
     #
     # DEBUG
     #
-    print "### Begining of Phase 2 ###"
-    print "---------------------------"
-    print "Community id, node id, nodes_in_community"
-    print "---------------------------"
-    for k, v in self.iteritems():
-      print k,v
-    for n in self._G.nodes():
-      print self._G.node[n]['nodes_in_community']
-    print "### End of Phase 2 ###"
+    if self._DEBUG:
+      print "### Begining of Phase 2 ###"
+      print "---------------------------"
+      print "Community id, node id, nodes_in_community"
+      print "---------------------------"
+      for k, v in self.iteritems():
+        print k,v
+      for n in self._G.nodes():
+        print self._G.node[n]['nodes_in_community']
+      print "### End of Phase 2 ###"
+
+    return self

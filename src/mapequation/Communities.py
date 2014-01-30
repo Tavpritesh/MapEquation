@@ -28,7 +28,7 @@ __author__ = """\n""".join(['Vincent Gauthier <vgauthier@luxbulb.org>'])
 import networkx as nx
 from functools import partial
 
-class Communities:
+class Communities(object):
 
   #
   # Class Variables
@@ -37,13 +37,14 @@ class Communities:
   _communities = {}
   _nodes = 0
   _alpha = 0
-
+  _DEBUG = False
   #
   # Constructor
   #
-  def __init__(self, G, alpha=0.85, weight='weight'):
+  def __init__(self, G, alpha=0.85, weight='weight', debug=False):
     if not isinstance(G, nx.classes.graph.Graph):
       raise AttributeError('The Graph is not an instance of networkx Graph')
+    self._DEBUG = debug
     self._G = G.copy()
     self._nodes = len(self._G)
     self._alpha = alpha
