@@ -78,11 +78,11 @@ class test_Communities(unittest.TestCase):
     self.assertEqual([c for c in C],[0,1,2,3])
 
   def test_nodes_in_community(self):
-    "Test if the node in community attribut in each nodes is empty"
+    "Test if the node in community attribut in each nodes contain the node id"
     C = Communities(self.G)
     G = C.graph
     for n in G.nodes():
-      self.assertEqual(G.node[n]['nodes_in_community'] , [])
+      self.assertEqual(G.node[n]['nodes_in_community'] , [n])
 
   def test_pageRank(self):
     "Test the pageRank computation"

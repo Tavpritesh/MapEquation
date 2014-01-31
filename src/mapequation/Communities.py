@@ -99,7 +99,7 @@ class Communities(object):
 
   def init_nodes_in_community(self):
     for n in self._G.nodes():
-      self._G.node[n]['nodes_in_community'] = []
+      self._G.node[n]['nodes_in_community'] = [n]
 
   def gen_communities_dict(self):
     '''

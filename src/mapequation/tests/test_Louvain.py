@@ -47,6 +47,20 @@ class test_Louvain(unittest.TestCase):
     self.G.add_edge(2,3, weight=10)
     self.G.add_edge(3,1, weight=10)
     self.G.add_edge(3,2, weight=10)
+
+    self.G1 = nx.DiGraph()
+    self.G1.add_nodes_from([0,1,2,3,4,5])
+    self.G1.add_edge(0,1, weight=1)
+    self.G1.add_edge(1,0, weight=1)
+    self.G1.add_edge(1,2, weight=10)
+    self.G1.add_edge(2,3, weight=10)
+    self.G1.add_edge(3,1, weight=10)
+    self.G1.add_edge(3,2, weight=10)
+    self.G1.add_edge(4,0, weight=1)
+    self.G1.add_edge(1,4, weight=1)
+    self.G1.add_edge(4,5, weight=1)
+    self.G1.add_edge(5,2, weight=1)
+
     self.phase1 = {1: [0], 2: [1], 3:[2,3]}
 
   def test_Louvain_init(self):
@@ -64,17 +78,22 @@ class test_Louvain(unittest.TestCase):
       self.assertEqual(L.get_node_in_community(k), self.phase1[v.pop()])
 
   def test_run_louvain(self):
-    for u,v, edata in self.G.edges(data=True):
-      print u,v, edata
-    L = Louvain(self.G, debug=True).run_louvain()
+    L = Louvain(self.G)
+    L.run_louvain()
     for k,v in L.iteritems():
       self.assertEqual(L.get_node_in_community(k), self.phase1[v.pop()])
 
   def test_run_louvain2(self):
-    L = Louvain(self.G).run_louvain()
-    nx.pagerank(L._G)
+    L = Louvain(self.G)
+    L.run_louvain()
     for k,v in L.iteritems():
       self.assertEqual(L.get_node_in_community(k), self.phase1[v.pop()])
+
+  def test_run_louvain3(self):
+    L = Louvain(self.G1, debug=True)
+    L.run_louvain()
+    L.run_louvain()
+    #print L.run_louvain()
 
 def main():
   unittest.main()

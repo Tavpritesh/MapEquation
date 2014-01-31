@@ -82,10 +82,9 @@ class Louvain(Communities):
 
     return self
 
-
   def louvain_phase_2(self):
     '''
-    To clean up
+    To Check
     '''
     G = nx.DiGraph()
     weight = self._weight_attribut
@@ -135,7 +134,6 @@ class Louvain(Communities):
       G[u_community_id][v_community_id][weight] = self._G[u][v][weight]
     return G
 
-
   def get_node_in_community(self, community):
     nodes = self._communities[community]
     node_in = []
@@ -145,23 +143,27 @@ class Louvain(Communities):
     return node_in
 
   def add_node_in_community(self, G, community_id, u):
+    # Initialize awith a empty list
     if 'nodes_in_community' not in G.node[community_id]:
-      G.node[community_id]['nodes_in_community'] = [u]
-    if u not in G.node[community_id]['nodes_in_community']:
-      G.node[community_id]['nodes_in_community'].append(u)
-    s1 = set(self._G.node[u]['nodes_in_community'])
-    s2 = set(G.node[community_id]['nodes_in_community'])
-    G.node[community_id]['nodes_in_community'] = list( s1 | s2)
+      G.node[community_id]['nodes_in_community'] = []
+
+    nn = self._G.node[u]['nodes_in_community']
+
+    if nn[0] not in G.node[community_id]['nodes_in_community']:
+      s1 = set(self._G.node[u]['nodes_in_community'])
+      s2 = set(G.node[community_id]['nodes_in_community'])
+      G.node[community_id]['nodes_in_community'] = list( s1 | s2)
     return G
 
   def run_louvain(self):
     self.louvain_phase_1()
     self.louvain_phase_2()
     self.normalize_edges_weight()
-    for u,v, edata in self._G.edges(data=True):
-      print(u,v, edata)
-    #self.compute_pagerank(alpha=self._alpha)
-    return self
+    try:
+      self.compute_pagerank(alpha=self._alpha)
+    except nx.NetworkXError as e:
+      return -1
+    return 0
 
 
 
