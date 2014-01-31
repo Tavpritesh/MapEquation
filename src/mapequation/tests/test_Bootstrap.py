@@ -1,5 +1,7 @@
+# -*- encoding: utf-8 -*-
+
 # -------------------------------------------------------------------------------
-# Copyright (c) 2013 Vincent Gauthier Telecom SudParis.
+# Copyright (c) 2014 Vincent Gauthier Telecom SudParis.
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -23,39 +25,51 @@
 
 __author__ = """\n""".join(['Vincent Gauthier <vgauthier@luxbulb.org>'])
 
+try:
+  from ..Bootstrap import Bootstrap
+except ValueError:
+  import sys, os
+  sys.path.append(os.path.join('..', '..'))
+  from mapequation.Bootstrap import Bootstrap
+
+import networkx as nx
 import numpy as np
+import unittest
 
-class Bootstrap:
-  def __init__(self, Graph, n=10, weight='weight', seed=None):
-    self._Graph = Graph
-    self._n = n
-    self._weight_attribut = weight
-    self._current = 0
-    if seed != None:
-      np.random.seed(seed=seed)
-    # Test if each edge of the graph has an attribut 'weight'
-    for u,v,edata in self._Graph.edges(data=True):
-      if self._weight_attribut not in self._Graph[u][v]:
-        raise AttributeError('The Graph has a missing weight attribut on his edges {} {}'.format(u,v))
+class test_Bootstrap(unittest.TestCase):
+  def __init__(self, *args, **kwargs):
+    super(test_Bootstrap, self).__init__(*args, **kwargs)
+    self.G = nx.DiGraph()
+    self.G.add_nodes_from([0,1,2,3])
+    self.G.add_edge(0,1, weight=1)
+    self.G.add_edge(1,0, weight=1)
+    self.G.add_edge(1,2, weight=10)
+    self.G.add_edge(2,3, weight=10)
+    self.G.add_edge(3,1, weight=10)
+    self.G.add_edge(3,2, weight=10)
+    self.weight = [10, 8, 5, 8, 0, 1]
 
-  def __iter__(self):
-    return self
+  def test_init(self):
+    B = Bootstrap(self.G)
 
-  def next(self):
-    if self._current >= self._n:
-      raise StopIteration
-    else:
-      self._current += 1
-      return self.generate()
+  def test_init_n(self):
+    B = Bootstrap(self.G, n=100)
+    cpt = 0
+    for b in B:
+      cpt += 1
+    self.assertEqual(cpt,100)
 
-  def generate(self):
-    '''
-    Generate a random boostrap of the Graph (G)
-    '''
+  def test_init_weight(self):
+    self.assertRaises(AttributeError,Bootstrap, self.G, weight='xxxxx')
 
-    H = self._Graph.copy()
-    for u,v,edata in H.edges(data=True):
-      lam = int(edata[self._weight_attribut])
-      H[u][v]['weight'] = np.random.poisson(lam, 1).item(0)
+  def test_generate(self):
+    B = Bootstrap(self.G, n=1, seed=1)
+    g = B.next()
+    for u,v, edata in g.edges(data=True):
+      self.assertEqual(edata['weight'], self.weight.pop())
 
-    return H
+def main():
+  unittest.main()
+
+if __name__ == '__main__':
+    main()
