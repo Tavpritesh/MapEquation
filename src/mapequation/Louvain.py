@@ -54,16 +54,17 @@ class Louvain(Communities):
           config[self._G.node[n]['community_id']] = np.abs(ME_new)
       ## End For
 
-      # Search the local minimum
-      min_val = None
+      # Search the local minimum greedy phase
+      min_LM = None
       for k,v in config.iteritems():
-        if min_val == None:
-          min_val = v
+        if min_LM == None:
+          min_LM = v
           min_community = k
-        if v < min_val:
-          min_val = v
+        if v < min_LM:
+          min_LM = v
           min_community = k
       self._G.node[n]['community_id'] = min_community
+    self._LM = min_LM
     ## End For
 
 
@@ -78,6 +79,8 @@ class Louvain(Communities):
       print("---------------------------")
       for k, v in self.iteritems():
         print("{}\t\t{}".format(k,v))
+      print('---------------------------')
+      print('LM :', self._LM)
       print("### End of Phase 1 ###")
 
     return self
@@ -143,7 +146,7 @@ class Louvain(Communities):
     return node_in
 
   def add_node_in_community(self, G, community_id, u):
-    # Initialize awith a empty list
+    # Initialize with an empty list
     if 'nodes_in_community' not in G.node[community_id]:
       G.node[community_id]['nodes_in_community'] = []
 
@@ -158,12 +161,13 @@ class Louvain(Communities):
   def run_louvain(self):
     self.louvain_phase_1()
     self.louvain_phase_2()
-    self.normalize_edges_weight()
-    try:
-      self.compute_pagerank(alpha=self._alpha)
-    except nx.NetworkXError as e:
-      return -1
-    return 0
+    return self._LM
+    # self.normalize_edges_weight()
+    # try:
+    #   self.compute_pagerank(alpha=self._alpha)
+    # except nx.NetworkXError as e:
+    #   return -1
+    # return 0
 
 
 

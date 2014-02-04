@@ -49,19 +49,19 @@ class test_Louvain(unittest.TestCase):
     self.G.add_edge(3,2, weight=10)
 
     self.G1 = nx.DiGraph()
-    self.G1.add_nodes_from([0,1,2,3,4,5])
-    self.G1.add_edge(0,1, weight=1)
-    self.G1.add_edge(1,0, weight=1)
+    self.G1.add_nodes_from([1,2,3,4,5])
     self.G1.add_edge(1,2, weight=10)
     self.G1.add_edge(2,3, weight=10)
     self.G1.add_edge(3,1, weight=10)
     self.G1.add_edge(3,2, weight=10)
-    self.G1.add_edge(4,0, weight=1)
     self.G1.add_edge(1,4, weight=1)
     self.G1.add_edge(4,5, weight=1)
     self.G1.add_edge(5,2, weight=1)
+    self.G1.add_edge(5,4, weight=1)
 
     self.phase1 = {1: [0], 2: [1], 3:[2,3]}
+
+    self.Gkarate = nx.DiGraph(nx.read_pajek('karate.net'))
 
   def test_Louvain_init(self):
     L = Louvain(self.G)
@@ -91,8 +91,17 @@ class test_Louvain(unittest.TestCase):
 
   def test_run_louvain3(self):
     L = Louvain(self.G1, debug=True)
-    L.run_louvain()
-    L.run_louvain()
+    print 'LM', L.run_louvain()
+
+  #def test_run_louvain_karate(self):
+   # L = Louvain(self.Gkarate, weight='weight', debug=True)
+    # #G = L.graph
+    # for u,v,edata in self.Gkarate.edges(data=True):
+    #   print u,v, edata
+    # L.run_louvain()
+    # L.run_louvain()
+    # L.run_louvain()
+    # L.run_louvain()
     #print L.run_louvain()
 
 def main():

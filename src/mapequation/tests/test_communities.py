@@ -103,6 +103,10 @@ class test_Communities(unittest.TestCase):
     C = Communities(self.G)
     self.assertEqual(C.LM(), self.LM)
 
+  def test_MultiDiGraph(self):
+    G = nx.MultiDiGraph()
+    self.assertRaises(AttributeError, Communities, G)
+
 
 def main():
   unittest.main()

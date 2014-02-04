@@ -44,6 +44,8 @@ class Communities(object):
   def __init__(self, G, alpha=0.85, weight='weight', debug=False):
     if not isinstance(G, nx.classes.graph.Graph):
       raise AttributeError('The Graph is not an instance of networkx Graph')
+    if isinstance(G, nx.classes.multidigraph.MultiDiGraph):
+      raise AttributeError('The MultiDiGraph instance is not supported')
     self._DEBUG = debug
     self._G = G.copy()
     self._nodes = len(self._G)
@@ -113,25 +115,11 @@ class Communities(object):
         communities[self._G.node[n]['community_id']] = [n]
     self._communities = communities
 
-
-  # def node_in_community(self, community):
-  #   res = []
-  #   self.init_communities()
-  #   self.gen_communities_dict()
-  #   print self._communities
-  #   for nodes in self._communities[community]:
-  #     for n in nodes:
-  #       res.append(self._G.node[n]['nodes_in_community'])
-
-  #   return res
-
-
   def normalize_edges_weight(self):
     '''
     Normalize the
     '''
     weight = self._weight_attribut
-    # Normalize the edges weight
     for n in self._G.nodes():
       weight_tot = 0.0
       for neighbor in self._G.neighbors(n):
@@ -173,7 +161,6 @@ class Communities(object):
     resultats = self.run(self.exit_probability)
     cId, p_exit, p_i = zip(*resultats)
     q_sum = sum(p_exit)
-    #print 'q_sum ', q_sum, p_exit
 
 
     #
@@ -184,13 +171,13 @@ class Communities(object):
     # Maps of random walks on complex networks reveal community structure,
     # PNAS 2008 105 (4) 1118-1123.
     H = 0.0
-    for r in resultats:
-      cId, q, p_i = r
-      H += (q/q_sum) * log2(q/q_sum)
-      #print 'q, q_sum: ', q, q_sum
-    left_eq_1 = q_sum * H
-    #print 'left_eq_1 ', left_eq_1, H
-
+    if q_sum == float('inf'):
+        left_eq_1  = float('inf')
+    else:
+      for q in p_exit:
+        H += (q/q_sum) * log2(q/q_sum)
+      left_eq_1 = q_sum * H
+      print 'left', left_eq_1
     #
     # eq. (4, 5a, 5b)
     # SI Appendix of [1]
@@ -198,21 +185,22 @@ class Communities(object):
     # [1] Martin Rosvall and Carl T. Bergstrom,
     # Maps of random walks on complex networks reveal community structure,
     # PNAS 2008 105 (4) 1118-1123.
-    Hp = 0.0
     right_eq_1 = 0.0
-    for r in resultats:
-      sum_q_p_i = 0.0
-      cId, q, p_i = r
-      # eq(4)
-      sum_q_p_i = q+sum(p_i)
-      # eq(5a)
-      Hp_a = (q/sum_q_p_i) * log2(q/sum_q_p_i)
-      # eq(5b)
-      Hp_b = sum([(p/sum_q_p_i) * log2(p/sum_q_p_i) for p in p_i])
-      right_eq_1 += sum_q_p_i * (Hp_a + Hp_b)
-
+    if left_eq_1 != float('inf'):
+      for r in resultats:
+        sum_q_p_i = 0.0
+        cId, q, p_i = r
+        # eq(4)
+        sum_q_p_i = q+sum(p_i)
+        # eq(5a)
+        Hp_a = (q/sum_q_p_i) * log2(q/sum_q_p_i)
+        # eq(5b) HERE IS THE ERROR
+        Hp_b = sum([(p/sum_q_p_i) * log2(p/sum_q_p_i) for p in p_i])
+        print 'Hp_a', Hp_a, 'Hp_b', Hp_b, 'sum_q_p_i', sum_q_p_i
+        right_eq_1 += sum_q_p_i * (Hp_a + Hp_b)
 
     Lm = left_eq_1 + right_eq_1
+    print 'right_eq_1', right_eq_1
     return Lm
 
   def exit_probability(self, community_id, nodes_in_community):
@@ -241,6 +229,8 @@ class Communities(object):
     p_ergodic_stay = 0.0
     weight = self._weight_attribut
     nb_node_in_community = len(nodes_in_community)
+    if nb_node_in_community == len(self._G.nodes()):
+      p_exit = float('inf')
     p_i = []
     # Compute the exit probability of each node in the community
     for n in nodes_in_community:
