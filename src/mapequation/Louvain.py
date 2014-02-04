@@ -48,30 +48,32 @@ class Louvain(Communities):
     community_id = list(self.keys())
     shuffle(community_id)
     for k in community_id:
-      community = self._communities[k]
-      # For all node in community
-      config = {}
-      for node in community:
-        # For all node's neighbor not in the same community
-        for neighbor in self._G.neighbors(node):
-          if self._G.node[neighbor]['community_id'] != k :
-            # try to move all the nodes inside one community into the neighbor's community
-            # and Recompute the LM
-            comTo = self._G.node[neighbor]['community_id']
-            comFrom = self._G.node[node]['community_id']
-            node_moved = self.moveToCommunity(comFrom, comTo)
-            new_LM = np.abs(self.LM())
-            if new_LM < self._LM:
-              config[new_LM] = (comFrom,comTo)
-            # move the node back into their original community
-            self.moveNodeToCommunity(node_moved, comFrom)
-        if len(config.keys()):
-          min_val = min(config.keys())
-          (comFrom, comTo) = config[min_val]
-          self.moveToCommunity(comFrom, comTo)
-          self._LM = self.LM()
+      if k in self._communities:
+        print('community',k)
+        community = self._communities[k]
+        # For all node in community
+        config = {}
+        for node in community:
+          # For all node's neighbor not in the same community
+          for neighbor in self._G.neighbors(node):
+            if self._G.node[neighbor]['community_id'] != k :
+              # try to move all the nodes inside one community into the neighbor's community
+              # and Recompute the LM
+              comTo = self._G.node[neighbor]['community_id']
+              comFrom = self._G.node[node]['community_id']
+              node_moved = self.moveToCommunity(comFrom, comTo)
+              new_LM = np.abs(self.LM())
+              if new_LM < self._LM:
+                config[new_LM] = (comFrom,comTo)
+              # move the node back into their original community
+              self.moveNodeToCommunity(node_moved, comFrom)
+          if len(config.keys()):
+            min_val = min(config.keys())
+            (comFrom, comTo) = config[min_val]
+            self.moveToCommunity(comFrom, comTo)
+            self._LM = np.abs(self.LM())
 
-    self._LM = self.LM()
+    #self._LM = self.LM()
 
     # Debug
     if self._DEBUG:
