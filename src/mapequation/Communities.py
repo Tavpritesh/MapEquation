@@ -162,7 +162,6 @@ class Communities(object):
     cId, p_exit, p_i = zip(*resultats)
     q_sum = sum(p_exit)
 
-
     #
     # eq. (2,3)
     # SI Appendix of [1]
@@ -177,7 +176,6 @@ class Communities(object):
       for q in p_exit:
         H += (q/q_sum) * log2(q/q_sum)
       left_eq_1 = q_sum * H
-      print 'left', left_eq_1
     #
     # eq. (4, 5a, 5b)
     # SI Appendix of [1]
@@ -194,13 +192,10 @@ class Communities(object):
         sum_q_p_i = q+sum(p_i)
         # eq(5a)
         Hp_a = (q/sum_q_p_i) * log2(q/sum_q_p_i)
-        # eq(5b) HERE IS THE ERROR
+        # eq(5b) HERE IS THE ERROR sum_q_p_i
         Hp_b = sum([(p/sum_q_p_i) * log2(p/sum_q_p_i) for p in p_i])
-        print 'Hp_a', Hp_a, 'Hp_b', Hp_b, 'sum_q_p_i', sum_q_p_i
         right_eq_1 += sum_q_p_i * (Hp_a + Hp_b)
-
     Lm = left_eq_1 + right_eq_1
-    print 'right_eq_1', right_eq_1
     return Lm
 
   def exit_probability(self, community_id, nodes_in_community):
