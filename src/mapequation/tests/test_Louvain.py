@@ -74,16 +74,10 @@ class test_Louvain(unittest.TestCase):
     L = Louvain(self.G1, debug=True)
     LM = L.run_louvain()
 
-  #def test_run_louvain_karate(self):
-   # L = Louvain(self.Gkarate, weight='weight', debug=True)
-    # #G = L.graph
-    # for u,v,edata in self.Gkarate.edges(data=True):
-    #   print u,v, edata
-    # L.run_louvain()
-    # L.run_louvain()
-    # L.run_louvain()
-    # L.run_louvain()
-    #print L.run_louvain()
+  def test_run_louvain_karate(self):
+    L = Louvain(self.Gkarate, weight='weight', debug=True)
+    LM = L.run_louvain()
+    print LM
 
 def main():
   unittest.main()
