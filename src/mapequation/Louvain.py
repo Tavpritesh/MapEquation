@@ -158,16 +158,76 @@ class Louvain(Communities):
       G.node[community_id]['nodes_in_community'] = list( s1 | s2)
     return G
 
-  def run_louvain(self):
-    self.louvain_phase_1()
-    self.louvain_phase_2()
+
+  def louvain(self):
+    from random import shuffle
+    # Compute the  MapEquation for all communities
+    self._LM = np.abs(self.LM())
+    # For all communities
+    community_id = list(self.keys())
+    shuffle(community_id)
+    for k in community_id:
+      community = self._communities[k]
+      # For all node in community
+      config = {}
+      for node in community:
+        # For all node's neighbor not in the same community
+        for neighbor in self._G.neighbors(node):
+          if self._G.node[neighbor]['community_id'] != k :
+            # try to move all the nodes inside one community into the neighbor's community
+            # and Recompute the LM
+            comTo = self._G.node[neighbor]['community_id']
+            comFrom = self._G.node[node]['community_id']
+            node_moved = self.moveToCommunity(comFrom, comTo)
+            new_LM = np.abs(self.LM())
+            if new_LM < self._LM:
+              config[new_LM] = (comFrom,comTo)
+            # move the node back into their original community
+            self.moveNodeToCommunity(node_moved, comFrom)
+        if len(config.keys()):
+          min_val = min(config.keys())
+          (comFrom, comTo) = config[min_val]
+          self.moveToCommunity(comFrom, comTo)
+          self._LM = self.LM()
+
+    self._LM = self.LM()
+
+    # Debug
+    if self._DEBUG:
+      print('')
+      print("### Louvain ###")
+      print("---------------------------")
+      print("Community_id \t node_id")
+      print("---------------------------")
+      for k, v in self.iteritems():
+        print("{}\t\t{}".format(k,v))
+      print('---------------------------')
+      print('LM :', self._LM)
+      print("### End ###")
     return self._LM
-    # self.normalize_edges_weight()
-    # try:
-    #   self.compute_pagerank(alpha=self._alpha)
-    # except nx.NetworkXError as e:
-    #   return -1
-    # return 0
+
+  def moveToCommunity(self, communityFrom, communityTo):
+    node_moved = []
+    for node in self._G.nodes():
+      if self._G.node[node]['community_id'] == communityFrom:
+        self._G.node[node]['community_id'] = communityTo
+        node_moved.append(node)
+    return node_moved
+
+  def moveNodeToCommunity(self, node_set, communityTo):
+    for node in node_set:
+      self._G.node[node]['community_id'] = communityTo
+
+  def run_louvain(self):
+    LM = float('inf')
+    stop = True
+    while stop:
+      LM_new = self.louvain()
+      if LM_new < LM:
+        LM = LM_new
+      else:
+        stop = False
+    return LM
 
 
 

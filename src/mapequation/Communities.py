@@ -90,6 +90,10 @@ class Communities(object):
     self.gen_communities_dict()
     return self._communities.iteritems()
 
+  def keys(self):
+    self.gen_communities_dict()
+    return self._communities.keys()
+
   def init_communities(self):
     '''
     Initialize the communities structure with one single node in each community

@@ -90,8 +90,14 @@ class test_Louvain(unittest.TestCase):
       self.assertEqual(L.get_node_in_community(k), self.phase1[v.pop()])
 
   def test_run_louvain3(self):
+    L = Louvain(self.G1)
+    #print 'LM', L.run_louvain()
+    #print 'LM', L.run_louvain()
+
+  def test_run_louvain4(self):
     L = Louvain(self.G1, debug=True)
-    print 'LM', L.run_louvain()
+    L.run_louvain()
+    #print 'LM', L.run_louvain()
 
   #def test_run_louvain_karate(self):
    # L = Louvain(self.Gkarate, weight='weight', debug=True)
