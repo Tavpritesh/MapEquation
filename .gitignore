@@ -9,5 +9,5 @@ develop-eggs
 tmp
 build
 dist
-
+*.ipynb_checkpoints
 .coverage
