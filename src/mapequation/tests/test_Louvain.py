@@ -34,6 +34,7 @@ except ValueError:
 
 import networkx as nx
 import numpy as np
+import os
 import unittest
 
 class test_Louvain(unittest.TestCase):
@@ -61,33 +62,13 @@ class test_Louvain(unittest.TestCase):
 
     self.phase1 = {1: [0], 2: [1], 3:[2,3]}
 
-    self.Gkarate = nx.DiGraph(nx.read_pajek('karate.net'))
+    karate = os.path.dirname(os.path.abspath(__file__)) + '/karate.net'
+
+    self.Gkarate = nx.DiGraph(nx.read_pajek(karate))
 
   def test_Louvain_init(self):
     L = Louvain(self.G)
     self.assertTrue(isinstance(L, Louvain))
-
-  def test_Louvain_phase1(self):
-    L = Louvain(self.G).louvain_phase_1()
-    for k,v in L.iteritems():
-      self.assertEqual(self.phase1[k], v)
-
-  def test_Louvain_phase2(self):
-    L = Louvain(self.G).louvain_phase_1().louvain_phase_2()
-    for k,v in L.iteritems():
-      self.assertEqual(L.get_node_in_community(k), self.phase1[v.pop()])
-
-  def test_run_louvain(self):
-    L = Louvain(self.G)
-    L.run_louvain()
-    for k,v in L.iteritems():
-      self.assertEqual(L.get_node_in_community(k), self.phase1[v.pop()])
-
-  def test_run_louvain2(self):
-    L = Louvain(self.G)
-    L.run_louvain()
-    for k,v in L.iteritems():
-      self.assertEqual(L.get_node_in_community(k), self.phase1[v.pop()])
 
   def test_run_louvain3(self):
     L = Louvain(self.G1, debug=True)
