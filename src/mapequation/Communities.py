@@ -26,6 +26,7 @@
 __author__ = """\n""".join(['Vincent Gauthier <vgauthier@luxbulb.org>'])
 
 import networkx as nx
+from .pagerank import pagerank
 from functools import partial
 
 class Communities(object):
@@ -129,7 +130,7 @@ class Communities(object):
       for neighbor in self._G.neighbors(n):
         weight_tot += self._G[n][neighbor][weight]
       for neighbor in self._G.neighbors(n):
-        self._G[n][neighbor][weight] = self._G[n][neighbor][weight]/weight_tot
+        self._G[n][neighbor][weight] = float(self._G[n][neighbor][weight])/weight_tot
 
   def run(self, action):
     p = partial(action)
@@ -145,10 +146,11 @@ class Communities(object):
       Damping parameter for PageRank, default=0.85
     '''
     # Return the pageRank into a dict
-    pangeRank = nx.pagerank(self._G, alpha=alpha)
+    pangeRank = pagerank(self._G, alpha=alpha, weight=self._weight_attribut)
     # Update the the pageRank of each node in the graph G
     for n in self._G.nodes():
-      self._G.node[n]['pageRank'] = float(pangeRank[n])
+      self._G.node[n]['pageRank'] = pangeRank[n]
+      print n, self._G.node[n]['pageRank']
 
 
   def LM(self):
@@ -242,7 +244,7 @@ class Communities(object):
       # Compute the P_exit as funtion of the pageRank of each node in the community
       p_exit *= self._alpha
       p_exit += ((1-self._alpha) *
-        ((self._nodes - nb_node_in_community)/(self._nodes - 1)) *
+        (float(self._nodes - nb_node_in_community)/(self._nodes - 1)) *
         p_ergodic_stay)
 
     return (community_id, p_exit, p_i)
