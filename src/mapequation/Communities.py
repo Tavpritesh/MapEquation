@@ -47,6 +47,10 @@ class Communities(object):
       raise AttributeError('The Graph is not an instance of networkx Graph')
     if isinstance(G, nx.classes.multidigraph.MultiDiGraph):
       raise AttributeError('The MultiDiGraph instance is not supported')
+    if not isinstance(G, nx.classes.digraph.DiGraph):
+      print('gen directed graph')
+      G = self.gen_directed_graph(G, weight=weight)
+
     self._DEBUG = debug
     self._nodes = len(self._G)
     self._alpha = alpha
@@ -147,17 +151,13 @@ class Communities(object):
     for n in self._G.nodes():
       self._G.node[n]['pageRank'] = float(pangeRank[n])
       if self._DEBUG:
-        print 'PageRank Computution for node :', n , ' is ', self._G.node[n]['pageRank']
+        print 'Compute the pagerank of node :', n , ' is ', self._G.node[n]['pageRank']
 
 
   def LM(self):
     '''
     MapEquation algorithm
     '''
-
-    # Import
-    from numpy import log2
-
     # Init variables
     q_sum = 0.0
 
@@ -177,7 +177,7 @@ class Communities(object):
         left_eq_1  = float('inf')
     else:
       for q in p_exit:
-        H += (q/q_sum) * log2(q/q_sum)
+        H += self.plogp(q,q_sum)
       left_eq_1 = q_sum * H
     #
     # eq. (4, 5a, 5b)
@@ -194,12 +194,24 @@ class Communities(object):
         # eq(4)
         sum_q_p_i = q+sum(p_i)
         # eq(5a)
-        Hp_a = (q/sum_q_p_i) * log2(q/sum_q_p_i)
+        try:
+          Hp_a = self.plogp(q,sum_q_p_i)
+        except ZeroDivisionError as e:
+          Hp_a = 0.0
         # eq(5b)
-        Hp_b = sum([(p/sum_q_p_i) * log2(p/sum_q_p_i) for p in p_i])
+        Hp_b = sum([self.plogp(p,sum_q_p_i) for p in p_i])
         right_eq_1 += sum_q_p_i * (Hp_a + Hp_b)
     Lm = left_eq_1 + right_eq_1
     return Lm
+
+  def plogp(self, a, b):
+    # Import
+    from numpy import log2
+
+    if a > 0.0 and b > 0:
+      return (a/b)*(log2(a) - log2(b))
+    else:
+      return 0.0
 
   def exit_probability(self, community_id, nodes_in_community):
     '''
@@ -245,4 +257,13 @@ class Communities(object):
       #  p_ergodic_stay)
 
     return (community_id, p_exit, p_i)
+
+  def gen_directed_graph(self, G, weight='weight'):
+    G1 = nx.DiGraph()
+    for u,v,edata in G.edges(data=True):
+      G1.add_edge(u,v)
+      G1[u][v][weight] = edata[weight]
+      G1.add_edge(v,u)
+      G1[v][u][weight] = edata[weight]
+    return G1
 

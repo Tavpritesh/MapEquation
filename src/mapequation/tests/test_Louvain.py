@@ -40,14 +40,6 @@ import unittest
 class test_Louvain(unittest.TestCase):
   def __init__(self, *args, **kwargs):
     super(test_Louvain, self).__init__(*args, **kwargs)
-    self.G = nx.DiGraph()
-    self.G.add_nodes_from([0,1,2,3])
-    self.G.add_edge(0,1, weight=1)
-    self.G.add_edge(1,0, weight=1)
-    self.G.add_edge(1,2, weight=10)
-    self.G.add_edge(2,3, weight=10)
-    self.G.add_edge(3,1, weight=10)
-    self.G.add_edge(3,2, weight=10)
 
     self.G1 = nx.DiGraph()
     self.G1.add_nodes_from([1,2,3,4,5])
@@ -59,20 +51,29 @@ class test_Louvain(unittest.TestCase):
     self.G1.add_edge(4,5, weight=1.0)
     self.G1.add_edge(5,2, weight=1.0)
     self.G1.add_edge(5,4, weight=1.0)
+    self.result_louvain_LM = 1.7195031710856228
 
     self.phase1 = {1: [0], 2: [1], 3:[2,3]}
 
-    karate = os.path.dirname(os.path.abspath(__file__)) + '/karate.net'
+    karate = os.path.dirname(os.path.abspath(__file__)) + '/karate.gml'
 
-    self.Gkarate = nx.DiGraph(nx.read_pajek(karate))
+    self.Gkarate = nx.read_gml(karate)
+    for u,v in self.Gkarate.edges():
+      self.Gkarate[u][v]['weight'] = 1.0
 
   def test_Louvain_init(self):
     L = Louvain(self.G1)
     self.assertTrue(isinstance(L, Louvain))
 
-  def test_run_louvain3(self):
-    L = Louvain(self.G1, debug=True)
-    LM = L.run_louvain()
+  def test_run_louvain(self):
+    L = Louvain(self.G1)
+    self.assertEqual(L.run_louvain(), self.result_louvain_LM)
+    L.print_map()
+
+  def test_run_louvain_karate(self):
+    L = Louvain(self.Gkarate)
+    L.run_louvain()
+    L.print_map()
 
 def main():
   unittest.main()

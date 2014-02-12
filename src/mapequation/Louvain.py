@@ -49,7 +49,6 @@ class Louvain(Communities):
     shuffle(community_id)
     for k in community_id:
       if k in self._communities:
-        print('community',k)
         community = self._communities[k]
         # For all node in community
         config = {}
@@ -111,6 +110,16 @@ class Louvain(Communities):
       else:
         stop = False
     return LM
+
+  def print_map(self):
+    print('# codelength: {}'.format(self._LM))
+    print('* Modules')
+    for k,v in self.iteritems():
+      (community_id, p_exit, p_i) = self.exit_probability(k,v)
+      print('{} {} {} {}'.format(k,v,sum(p_i),p_exit))
+    print('* Node: {}'.format(len(self._G.nodes())) )
+    for n in self._G.nodes():
+      print('{}:{} {}'.format(self._G.node[n]['community_id'], n, self._G.node[n]['pageRank']))
 
 
 
