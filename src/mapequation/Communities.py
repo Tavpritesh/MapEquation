@@ -127,18 +127,6 @@ class Communities(object):
     for n in G.nodes():
       self._personalization[n] = float(G.out_degree(n,weight='weight'))/sumW
 
-  # def normalize_edges_weight(self):
-  #   '''
-  #   Normalize the
-  #   '''
-  #   weight = self._weight_attribut
-  #   for n in self._G.nodes():
-  #     weight_tot = 0.0
-  #     for neighbor in self._G.neighbors(n):
-  #       weight_tot += self._G[n][neighbor][weight]
-  #     for neighbor in self._G.neighbors(n):
-  #       self._G[n][neighbor][weight] = float(self._G[n][neighbor][weight])/weight_tot
-
   def run(self, action):
     p = partial(action)
     return [p(k,v) for k,v in self.iteritems()]
@@ -207,7 +195,7 @@ class Communities(object):
         sum_q_p_i = q+sum(p_i)
         # eq(5a)
         Hp_a = (q/sum_q_p_i) * log2(q/sum_q_p_i)
-        # eq(5b) HERE IS THE ERROR sum_q_p_i
+        # eq(5b)
         Hp_b = sum([(p/sum_q_p_i) * log2(p/sum_q_p_i) for p in p_i])
         right_eq_1 += sum_q_p_i * (Hp_a + Hp_b)
     Lm = left_eq_1 + right_eq_1
@@ -251,10 +239,10 @@ class Communities(object):
         if neighbor not in nodes_in_community:
           p_exit += self._G.node[n]['pageRank'] * self._G[n][neighbor][weight]
       # Compute the P_exit as funtion of the pageRank of each node in the community
-      p_exit *= self._alpha
-      p_exit += ((1-self._alpha) *
-        (float(self._nodes - nb_node_in_community)/(self._nodes - 1)) *
-        p_ergodic_stay)
+      #p_exit *= self._alpha
+      #p_exit += ((1-self._alpha) *
+      #  (float(self._nodes - nb_node_in_community)/(self._nodes - 1)) *
+      #  p_ergodic_stay)
 
     return (community_id, p_exit, p_i)
 
