@@ -47,12 +47,18 @@ class test_Communities(unittest.TestCase):
     self.G.add_edge(2,3, weight=10)
     self.G.add_edge(3,1, weight=10)
     self.G.add_edge(3,2, weight=10)
-    self.LM = -3.7812341924542952
+    self.LM = -3.6495521636553989
     self.result_p_exit = {}
-    self.result_p_exit[0] = (0, 0.05545240613126138, [0.05545240613126138])
-    self.result_p_exit[1] = (1, 0.232325259704312, [0.23232525970431203])
-    self.result_p_exit[2] = (2, 0.36471477553136467, [0.36471477553136467])
-    self.result_p_exit[3] = (3, 0.34750755863306193, [0.34750755863306193])
+    self.result_p_exit[0] = (0, 0.02011710462718902, [0.02011710462718902])
+    self.result_p_exit[1] = (1, 0.21412051366278162, [0.21412051366278162])
+    self.result_p_exit[2] = (2, 0.3946205924301328, [0.3946205924301328])
+    self.result_p_exit[3] = (3, 0.3711417892798966, [0.3711417892798966])
+    self.result_pr = {
+      0: 0.0201171046272,
+      1: 0.214120513663,
+      2: 0.39462059243,
+      3:  0.37114178928
+    }
 
   def test_Communities_init(self):
     "Test Communities Constructor"
@@ -86,11 +92,10 @@ class test_Communities(unittest.TestCase):
 
   def test_pageRank(self):
     "Test the pageRank computation"
-    pr = nx.pagerank(self.G, alpha=0.85)
-    C = Communities(self.G, alpha=0.85)
+    C = Communities(self.G, alpha=0.85, debug=True)
     G = C.graph
     for n in G.nodes():
-      self.assertEqual(G.node[n]['pageRank'] , pr[n])
+      self.assertAlmostEqual(G.node[n]['pageRank'], self.result_pr[n])
 
   def test_exit_probability(self):
     "Test the exit probability"

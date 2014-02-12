@@ -20,7 +20,8 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 # -------------------------------------------------------------------------------
-__all__ = ['__version__', 'Communities']
+__all__ = ['__version__', 'Communities', 'pagerank_unrecorded']
 __version__ = '0.1'
 
 from Communities import Communities
+from pagerank import pagerank_unrecorded

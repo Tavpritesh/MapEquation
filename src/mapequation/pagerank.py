@@ -27,28 +27,25 @@ __author__ = """\n""".join(['Vincent Gauthier <vgauthier@luxbulb.org>'])
 
 import networkx as nx
 
-def pagerank(G, weight='weight', max_iter=100000, tol=1e-14, alpha=0.85):
-  # Init
-  W=nx.stochastic_graph(G, weight=weight)
-  personalization = dict.fromkeys(W, 0)
-  p = dict.fromkeys(W, 0)
-  sumW = sum([edata['weight'] for u,v,edata in G.edges(data=True)])
-
-  # Personalization Vector
-  for n in G.nodes():
-    personalization[n] = float(G.out_degree(n,weight='weight'))/sumW
+def pagerank_unrecorded(G,
+                        personalization,
+                        weight='weight',
+                        max_iter=100000,
+                        tol=1e-14,
+                        alpha=0.85):
+  p = dict.fromkeys(G, 0)
 
   # Classical PageRank Algorithm with personalization vector
-  pr = nx.pagerank(W,
+  pr = nx.pagerank(G,
                    max_iter=max_iter,
                    tol=tol,
                    alpha=alpha,
                    personalization=personalization)
 
-  # Final step: compute the unrecorded Teleportation
-  for u in W.nodes():
-    for v in nx.neighbors(W,u):
-      p[v] += W[u][v]['weight']*pr[u]
+  # Final step: in order to compute the unrecorded teleportation
+  for u in G.nodes():
+    for v in nx.neighbors(G,u):
+      p[v] += G[u][v]['weight']*pr[u]
 
   # normalize vector results
   s=1.0/sum(p.values())

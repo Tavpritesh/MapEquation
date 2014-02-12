@@ -26,7 +26,7 @@
 __author__ = """\n""".join(['Vincent Gauthier <vgauthier@luxbulb.org>'])
 
 import networkx as nx
-from .pagerank import pagerank
+from .pagerank import pagerank_unrecorded
 from functools import partial
 
 class Communities(object):
@@ -48,21 +48,21 @@ class Communities(object):
     if isinstance(G, nx.classes.multidigraph.MultiDiGraph):
       raise AttributeError('The MultiDiGraph instance is not supported')
     self._DEBUG = debug
-    self._G = G.copy()
     self._nodes = len(self._G)
     self._alpha = alpha
     weight_tot = 0.0
     # Test if each edge of the graph has an attribut 'weight'
     self._weight_attribut = weight
-    for u,v,edata in self._G.edges(data=True):
+    for u,v,edata in G.edges(data=True):
       if self._weight_attribut not in edata:
         raise AttributeError('The Graph has a missing weight attribut on edges')
 
+    self._G = nx.stochastic_graph(G, weight=weight)
 
     # Compute the pageRank for the Graph
     self.init_nodes_in_community()
     self.init_communities()
-    self.normalize_edges_weight()
+    self.build_personalization_vector(G)
     self.compute_pagerank(alpha=alpha)
 
   def __str__(self):
@@ -120,17 +120,24 @@ class Communities(object):
         communities[self._G.node[n]['community_id']] = [n]
     self._communities = communities
 
-  def normalize_edges_weight(self):
-    '''
-    Normalize the
-    '''
-    weight = self._weight_attribut
-    for n in self._G.nodes():
-      weight_tot = 0.0
-      for neighbor in self._G.neighbors(n):
-        weight_tot += self._G[n][neighbor][weight]
-      for neighbor in self._G.neighbors(n):
-        self._G[n][neighbor][weight] = float(self._G[n][neighbor][weight])/weight_tot
+  def build_personalization_vector(self, G):
+    self._personalization = dict.fromkeys(G, 0)
+    sumW = sum([edata['weight'] for u,v,edata in G.edges(data=True)])
+    # Personalization Vector
+    for n in G.nodes():
+      self._personalization[n] = float(G.out_degree(n,weight='weight'))/sumW
+
+  # def normalize_edges_weight(self):
+  #   '''
+  #   Normalize the
+  #   '''
+  #   weight = self._weight_attribut
+  #   for n in self._G.nodes():
+  #     weight_tot = 0.0
+  #     for neighbor in self._G.neighbors(n):
+  #       weight_tot += self._G[n][neighbor][weight]
+  #     for neighbor in self._G.neighbors(n):
+  #       self._G[n][neighbor][weight] = float(self._G[n][neighbor][weight])/weight_tot
 
   def run(self, action):
     p = partial(action)
@@ -146,11 +153,13 @@ class Communities(object):
       Damping parameter for PageRank, default=0.85
     '''
     # Return the pageRank into a dict
-    pangeRank = pagerank(self._G, alpha=alpha, weight=self._weight_attribut)
+    pangeRank = pagerank_unrecorded(self._G, self._personalization,
+                                    alpha=alpha, weight=self._weight_attribut)
     # Update the the pageRank of each node in the graph G
     for n in self._G.nodes():
-      self._G.node[n]['pageRank'] = pangeRank[n]
-      print n, self._G.node[n]['pageRank']
+      self._G.node[n]['pageRank'] = float(pangeRank[n])
+      if self._DEBUG:
+        print 'PageRank Computution for node :', n , ' is ', self._G.node[n]['pageRank']
 
 
   def LM(self):
